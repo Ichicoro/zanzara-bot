@@ -1,9 +1,6 @@
-import datetime
-import json
-import sqlite3
-import functools
-import shutil
+import datetime, json, sqlite3, functools, shutil
 from io import BytesIO
+from typing import Callable
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler
 from telegram.ext.filters import Filters
@@ -33,6 +30,22 @@ except Exception:
     exit(2)
 
 
+def with_connection(func: Callable[[Update, CallbackContext, sqlite3.Connection], None]):
+    @functools.wraps(func)
+    def wrapper_with_conn(update: Update, callback: CallbackContext):
+        con = None
+        try:
+            con = sqlite3.connect('zanzara.db')
+        except sqlite3.Error:
+            print("Unable to connect to db...")
+            update.message.reply_text("C'è un problema col db, sono desolatə. @Ichicoro vieni a fixarmi pls")
+            return
+        func(update, callback, con)
+        con.commit()
+        con.close()
+    return wrapper_with_conn
+
+
 def reset_points(context: CallbackContext):
     con = None
     try:
@@ -51,13 +64,8 @@ def hello(update: Update, context: CallbackContext) -> None:
     update.message.reply_text(f'Hello {update.effective_user.first_name}')
 
 
-def handle_clessy(update: Update, context: CallbackContext) -> None:
-    con = None
-    try:
-        con = sqlite3.connect('zanzara.db')
-    except sqlite3.Error:
-        update.message.reply_text("C'è un problema col db, sono desolatə. @Ichicoro vieni a fixarmi pls")
-
+@with_connection
+def handle_clessy(update: Update, context: CallbackContext, con: sqlite3.Connection) -> None:
     if update.message.reply_to_message is None or update.message.reply_to_message.text == "":
         update.message.reply_text("Questo comando funziona solo se lo usi mentre rispondi a un messaggio 😅")
         return
@@ -90,9 +98,6 @@ def handle_clessy(update: Update, context: CallbackContext) -> None:
             amount_created = amount_created + 1
         WHERE user_id = :userid
     """, {'userid': user_id})
-
-    con.commit()
-    con.close()
 
     print(update.message.reply_to_message)
 
