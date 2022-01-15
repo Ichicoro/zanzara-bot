@@ -4,6 +4,7 @@ from typing import Callable
 from telegram import Update
 from telegram.ext import Updater, CommandHandler, CallbackContext, MessageHandler
 from telegram.ext.filters import Filters
+from random import randint
 
 from image import create_img
 
@@ -69,6 +70,11 @@ def handle_clessy(update: Update, context: CallbackContext, con: sqlite3.Connect
     if update.message.reply_to_message is None or update.message.reply_to_message.text == "":
         update.message.reply_text("Questo comando funziona solo se lo usi mentre rispondi a un messaggio 😅")
         return
+
+    if update.message.from_user.id == 341049157:
+        if randint(0,1) == 1:
+            update.message.reply_text("Oggi non mi va di creare immagini per @Kendottanta :)")
+            return
 
     replied = update.message.reply_to_message
     user_id = replied.from_user.id

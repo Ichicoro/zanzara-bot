@@ -1,3 +1,5 @@
 config.json
 zanzara.db
 test.png
+__pycache__/image.cpython-310.pyc
+zanzara.db-journal

@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "zanzara-bot"
+version = "0.1.0"
+description = ""
+authors = ["Ichicoro"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-telegram-bot = "*"
+pillow = "*"
+requests = "*"
+
+[tool.poetry.dev-dependencies]
+black = "*"
+autopep8 = "*"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
